@@ -114,6 +114,8 @@ class VolumeLoader(object):
             self.volume_path
         )
 
+        self.volume_path = str(self.volume_path)
+
         if os.path.isfile(self.volume_path):
             assert self.volume_path.endswith(".tar.gz")
 
