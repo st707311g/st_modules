@@ -103,7 +103,6 @@ class VolumeLoader(object):
         ".jpg",
         ".jpeg",
     )
-    logger: logging.Logger = field(default=None, repr=False)
     volume_info_file_name: Final[str] = VOLUME_INFO_FILE_NAME
 
     @property
@@ -111,8 +110,6 @@ class VolumeLoader(object):
         return {"mm_resolution": 0.3}
 
     def __post_init__(self):
-        self.logger = self.logger or logging.getLogger(self.__class__.__name__)
-
         assert os.path.isdir(self.volume_path) or os.path.isfile(
             self.volume_path
         )
@@ -153,8 +150,6 @@ class VolumeLoader(object):
         return self.image_file_number >= self.minimum_file_number
 
     def load_files_iterably(self):
-        self.logger.info(f"Loading image files: {self.volume_path}")
-
         volume_information = self.DEFAULT_VOLUME_INFORMATION
         image_list = []
         image_file_number = self.image_file_number
@@ -206,13 +201,10 @@ class VolumeSaver(object):
     """
 
     volume3d: Final[Volume3D]
-    logger: logging.Logger = field(default=None, repr=False)
     digits: Final[int] = 4
     volume_info_file_name: Final[str] = VOLUME_INFO_FILE_NAME
 
     def __post_init__(self):
-        self.logger = self.logger or logging.getLogger(self.__class__.__name__)
-
         assert self.is_valid_volume_dtype()
         assert self.is_valid_volume_shape()
         assert self.digits > 0
@@ -236,9 +228,6 @@ class VolumeSaver(object):
         destination_directory_path = Path(destination_directory)
         os.makedirs(destination_directory_path, exist_ok=True)
 
-        self.logger.info(
-            f"Saving {self.np_volume.shape[0]} image files: {destination_directory_path}"
-        )
         for i, img in enumerate(self.slice_generator):
             image_file_path = Path(
                 destination_directory_path,
