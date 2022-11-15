@@ -2,8 +2,8 @@
 
 ![python](https://img.shields.io/badge/Python->3.8-lightgreen)
 ![developed_by](https://img.shields.io/badge/developed%20by-Shota_Teramoto-lightgreen)
-![version](https://img.shields.io/badge/version-1.0-lightgreen)
-![last_updated](https://img.shields.io/badge/last_update-October_14,_2022-lightgreen)
+![version](https://img.shields.io/badge/version-1.1-lightgreen)
+![last_updated](https://img.shields.io/badge/last_update-November_15,_2022-lightgreen)
 
 ## modules
 
@@ -27,3 +27,6 @@ https://rootomics.dna.affrc.go.jp/en/
 
 - version 1.0 (Oct 14, 2022)
   - initial version uploaded
+- version 1.1 (Nov 15, 2022)
+  - type fix
+  - added the parameter `including_source_directoriy` into the `walk_to_find_directories` function.
