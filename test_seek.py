@@ -19,7 +19,7 @@ from seek import walk_to_find_directories, walk_to_find_files
 class TestSeek(unittest.TestCase):
     def setUp(self):
         self.temporary_directory_p = TemporaryDirectory()
-        self.temporary_directory_path = self.temporary_directory_p.name
+        self.temporary_directory_path = Path(self.temporary_directory_p.name)
 
         # // making temporary directories and files
         self.num_of_test_directories = 10
@@ -58,6 +58,25 @@ class TestSeek(unittest.TestCase):
             )
         )
         self.assertEqual(len(dir_list), self.num_of_test_directories)
+
+        dir_list = list(
+            walk_to_find_directories(
+                path=self.temporary_directory_path,
+                including_source_directoriy=True,
+            )
+        )
+        self.assertEqual(
+            len(dir_list), self.num_of_nested_test_directories + 1
+        )
+
+        dir_list = list(
+            walk_to_find_directories(
+                path=self.temporary_directory_path,
+                depth=1,
+                including_source_directoriy=True,
+            )
+        )
+        self.assertEqual(len(dir_list), self.num_of_test_directories + 1)
 
     def test_seek_walk_to_find_files(self):
         # // test in nested directory

@@ -1,4 +1,4 @@
-"""Functions for file and directory listing
+"""Functions for 3D volume handling
 
 Author:
     Shota Teramoto (st707311g@gmail.com)

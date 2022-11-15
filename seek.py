@@ -11,29 +11,36 @@ Licence:
 import math
 import operator
 import os
+from pathlib import Path
 
 
-def walk_to_find_directories(path: str, depth: int = math.inf):
+def walk_to_find_directories(
+    path: str, depth: int = math.inf, including_source_directoriy: bool = False
+):
     """A function returning the generator generating the subdirectory paths.
 
     Args:
         path (str): Path to be explored.
         depth (int, optional): Depth of the maximum level to be explored. Defaults to unlimited.
+        including_source_directoriy (bool, optional): Include the source directory in the resultd. Defaults to False.
 
     Yields:
-        str: directory path
+        Path: directory path
 
     Examples:
         for directory_path in walk_to_find_directories(target_directory_path):
             print(directory_path)
     """
+    if including_source_directoriy:
+        yield Path(path)
+
     depth -= 1
     with os.scandir(path) as p:
         p = list(p)
         p.sort(key=operator.attrgetter("name"))
         for entry in p:
             if entry.is_dir():
-                yield entry.path
+                yield Path(entry.path)
             if entry.is_dir() and depth > 0:
                 yield from walk_to_find_directories(entry.path, depth)
 
@@ -49,7 +56,7 @@ def walk_to_find_files(
         extension_filter (str, optional): Only results with extension listed in extension_filter will be returned. Defaults is no filtering.
 
     Yields:
-        str: file path.
+        Path: file path.
 
     Examples:
         for file_path in walk_to_find_files(target_directory_path):
@@ -62,10 +69,10 @@ def walk_to_find_files(
         for entry in list(p):
             if entry.is_file():
                 if extension_filter is None:
-                    yield entry.path
+                    yield Path(entry.path)
                 else:
                     if entry.path.lower().endswith(extension_filter):
-                        yield entry.path
+                        yield Path(entry.path)
 
             if entry.is_dir() and depth > 0:
                 yield from walk_to_find_files(
