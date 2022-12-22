@@ -187,6 +187,22 @@ class VolumeLoader(object):
     def is_valid_volume(self):
         return self.image_file_number >= self.minimum_file_number
 
+    def does_contain_sbi_point_cloud(self):
+        if os.path.isdir(self.volume_path):
+            point_cloud_path = Path(
+                self.volume_path, self.point_cloud_file_name
+            )
+            if os.path.isfile(point_cloud_path):
+                return True
+
+        elif os.path.isfile(self.volume_path):
+            with tarfile.open(name=self.volume_path, mode="r") as tar:
+                for info in tar.getmembers():
+                    if info.name == self.point_cloud_file_name:
+                        return True
+
+        return False
+
     def load_files_iterably(self):
         volume_information = self.DEFAULT_VOLUME_INFORMATION
         point_cloud = None
@@ -291,17 +307,15 @@ class VolumeSaver(object):
             yield i, len(self.np_volume)
 
         # // saving volume infomartion data
-        try:
+        if self.volume3d.information_dict is not None:
             with open(
                 Path(destination_directory_path, self.volume_info_file_name),
                 "w",
             ) as f:
                 json.dump(self.volume3d.information_dict, f)
-        except:
-            pass
 
         # // saving point cloud data
-        try:
+        if self.volume3d.point_cloud is not None:
             o3d.io.write_point_cloud(
                 str(
                     Path(
@@ -310,8 +324,6 @@ class VolumeSaver(object):
                 ),
                 self.volume3d.point_cloud,
             )
-        except:
-            pass
 
     def save_volume_as_archive_iterably(
         self, archive_path: str, extension="jpg"

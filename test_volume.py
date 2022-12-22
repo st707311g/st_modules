@@ -8,11 +8,6 @@ Licence:
 
 """
 
-# todo
-# VolumeLoader SBIファイルに対応
-
-
-import os
 import unittest
 from copy import deepcopy
 from glob import glob
@@ -139,9 +134,45 @@ class TestVolumeLoader(unittest.TestCase):
         ):
             pass
 
+        # // without sbi_point_cloud
+        self.test_volume3d_instance_without_sbi_point_cloud = (
+            get_Volume3D_test_data(point_cloud=None)
+        )
+
+        self.temporary_directory_p_without_sbi_point_cloud = (
+            TemporaryDirectory()
+        )
+        self.temporary_directory_path_without_sbi_point_cloud = Path(
+            self.temporary_directory_p_without_sbi_point_cloud.name
+        )
+
+        volume_saver = VolumeSaver(
+            self.test_volume3d_instance_without_sbi_point_cloud
+        )
+        for i, total in volume_saver.save_files_iterably(
+            destination_directory=self.temporary_directory_path_without_sbi_point_cloud,
+            extension="png",
+        ):
+            pass
+
+        self.temporary_archive_p_without_sbi_point_cloud = NamedTemporaryFile(
+            suffix=".tar.gz"
+        )
+        self.temporary_archive_path_without_sbi_point_cloud = Path(
+            self.temporary_archive_p_without_sbi_point_cloud.name
+        )
+
+        for i, total in volume_saver.save_volume_as_archive_iterably(
+            archive_path=self.temporary_archive_path_without_sbi_point_cloud,
+            extension="png",
+        ):
+            pass
+
     def tearDown(self) -> None:
         self.temporary_directory_p.cleanup()
         self.temporary_archive_p.close()
+        self.temporary_directory_p_without_sbi_point_cloud.cleanup()
+        self.temporary_archive_p_without_sbi_point_cloud.close()
 
     def test_volume_load(self):
         with self.assertRaises(AssertionError):
@@ -172,6 +203,21 @@ class TestVolumeLoader(unittest.TestCase):
             self.assertTrue(
                 volume3d == self.test_volume3d_instance,
             )
+
+    def test_does_contain_sbi_point_cloud(self):
+        for target in [
+            self.temporary_directory_path,
+            self.temporary_archive_path,
+        ]:
+            volume_loader = VolumeLoader(volume_path=target)
+            self.assertTrue(volume_loader.does_contain_sbi_point_cloud())
+
+        for target in [
+            self.temporary_directory_path_without_sbi_point_cloud,
+            self.temporary_archive_path_without_sbi_point_cloud,
+        ]:
+            volume_loader = VolumeLoader(volume_path=target)
+            self.assertFalse(volume_loader.does_contain_sbi_point_cloud())
 
 
 class TestVolumeSaver(unittest.TestCase):
